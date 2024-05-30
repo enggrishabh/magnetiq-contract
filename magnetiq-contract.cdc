@@ -41,7 +41,7 @@ import MetadataViews from 0x631e88ae7f1d7c20
 import MagnetiqLocking from 0x8c55fba7d7090fee
 import ViewResolver   from 0x631e88ae7f1d7c20
 
-access(all) contract Magnetiq: NonFungibleToken, ViewResolver {
+access(all) contract Magnetiq: NonFungibleToken {
     // -----------------------------------------------------------------------
     // Magnetiq deployment variables
     // -----------------------------------------------------------------------
@@ -669,7 +669,7 @@ access(all) contract Magnetiq: NonFungibleToken, ViewResolver {
 
     // The resource that represents the Tokens NFTs
     //
-    access(all) resource NFT: NonFungibleToken.NFT, ViewResolver.Resolver {
+    access(all) resource NFT: NonFungibleToken.NFT {
 
         access(all) event ResourceDestroyed(id: UInt64 = self.id)
 
@@ -1211,7 +1211,7 @@ access(all) contract Magnetiq: NonFungibleToken, ViewResolver {
     access(all) resource Collection: TokenCollectionPublic, NonFungibleToken.Collection { 
         // Dictionary of Token (Magnet/Memeto) conforming tokens
         // NFT is a resource type with a UInt64 ID field
-        access(contract) var ownedNFTs: @{UInt64: {NonFungibleToken.NFT}}
+        access(all) var ownedNFTs: @{UInt64: {NonFungibleToken.NFT}}
 
         init() {
             self.ownedNFTs <- {}
@@ -1235,7 +1235,7 @@ access(all) contract Magnetiq: NonFungibleToken, ViewResolver {
 
         // Return the amount of NFTs stored in the collection
         access(all) view fun getLength(): Int {
-            return self.ownedNFTs.keys.length
+            return self.ownedNFTs.length
         }
 
         // Create an empty Collection for TopShot NFTs and return it to the caller
