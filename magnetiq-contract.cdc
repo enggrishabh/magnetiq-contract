@@ -1208,7 +1208,7 @@ access(all) contract Magnetiq: NonFungibleToken {
     // Collection is a resource that every user who owns NFTs 
     // will store in their account to manage their NFTS
     //
-    access(all) resource Collection: TokenCollectionPublic, NonFungibleToken.Collection { 
+    access(all) resource Collection: TokenCollectionPublic, NonFungibleToken.Collection {
         // Dictionary of Token (Magnet/Memeto) conforming tokens
         // NFT is a resource type with a UInt64 ID field
         access(all) var ownedNFTs: @{UInt64: {NonFungibleToken.NFT}}
