@@ -1,14 +1,14 @@
 {
 	"contracts": {
-		"Magnetiq": "./magnetiq-contract.cdc",
-		"MagnetiqLocking": "./magnetiqlocking-contract.cdc"
+		"Magnetiq": "./magnetiq.cdc",
+		"MagnetiqLocking": "./magnetiqlocking.cdc"
 	},
 	"networks": {
 		"emulator": "127.0.0.1:3569",
 		"mainnet": "access.mainnet.nodes.onflow.org:9000",
+		"previewnet": "access.previewnet.nodes.onflow.org:9000",
 		"testing": "127.0.0.1:3569",
-		"testnet": "access.devnet.nodes.onflow.org:9000",
-		"previewnet": "access.previewnet.nodes.onflow.org:9000"
+		"testnet": "access.devnet.nodes.onflow.org:9000"
 	},
 	"accounts": {
 		"Aman": {
@@ -38,11 +38,18 @@
 				"type": "file",
 				"location": "emulator-account.pkey"
 			}
+		},
+		"Magnetiq": {
+			"address": "5257f1455ed366fe",
+			"key": {
+				"type": "file",
+				"location": "Magnetiq.pkey"
+			}
 		}
 	},
 	"deployments": {
-		"testnet": {
-			"Rishabh": [
+		"mainnet": {
+			"Magnetiq": [
 				"MagnetiqLocking",
 				"Magnetiq"
 			]

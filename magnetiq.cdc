@@ -35,21 +35,22 @@
     and those cases need to be handled by the caller.
 */
 
-import FungibleToken from 0x9a0766d93b6608b7
-import NonFungibleToken from 0x631e88ae7f1d7c20
-import MetadataViews from 0x631e88ae7f1d7c20
-import MagnetiqLocking from 0x8c55fba7d7090fee
+import FungibleToken from 0xf233dcee88fe0abe
+import NonFungibleToken from 0x1d7e57aa55817448
+import MetadataViews from 0x1d7e57aa55817448
+import MagnetiqLocking from 0x5257f1455ed366fe
+import ViewResolver from 0x1d7e57aa55817448
 
-pub contract Magnetiq: NonFungibleToken {
+access(all) contract Magnetiq: NonFungibleToken {
     // -----------------------------------------------------------------------
     // Magnetiq deployment variables
     // -----------------------------------------------------------------------
 
     // The network the contract is deployed on
-    pub fun Network() : String { return self.currentNetwork}
+    access(all) fun Network() : String { return self.currentNetwork }
 
     // The address to which royalties should be deposited
-    pub fun RoyaltyAddress() : Address { return self.royalityReceiver }
+    access(all) fun RoyaltyAddress() : Address { return self.royalityReceiver }
     
 
     // -----------------------------------------------------------------------
@@ -57,46 +58,46 @@ pub contract Magnetiq: NonFungibleToken {
     // -----------------------------------------------------------------------
 
     // Emitted when the Magnetiq contract is created
-    pub event ContractInitialized()
+    access(all) event ContractInitialized()
 
     // Emitted when a new Magnet struct is created
-    pub event MagnetCreated(id: String, metadata: {String:String})
+    access(all) event MagnetCreated(id: String, metadata: {String:String})
     
 
     // Events for Brand-Related actions
     //
     // Emitted when a new Brand is created
-    pub event BrandCreated(brandID: String)
+    access(all) event BrandCreated(brandID: String)
     // Emitted when a new Magnet is added to a Brand
-    pub event MagnetAddedToBrand(brandID: String, magnetID: String)
+    access(all) event MagnetAddedToBrand(brandID: String, magnetID: String)
     // Emitted when a Magnet is retired from a Brand and cannot be used to mint
-    pub event MagnetRetiredFromBrand(brandID: String, magnetID: String, numTokens: UInt32)
+    access(all) event MagnetRetiredFromBrand(brandID: String, magnetID: String, numTokens: UInt32)
     // Emitted when a Brand is locked, meaning Magnets cannot be added
-    pub event BrandLocked(brandID: String)
+    access(all) event BrandLocked(brandID: String)
     // Emitted when a Tokens is minted from a Brand
-    pub event TokensMinted(tokenID: UInt64, tokenType:String , magnetiqID: String, brandID: String, serialNumber: UInt32)
+    access(all) event TokensMinted(tokenID: UInt64, tokenType:String , magnetiqID: String, brandID: String, serialNumber: UInt32)
 
     // Events for Collection-related actions
     //
     // Emitted when a token is withdrawn from a Collection
-    pub event Withdraw(id: UInt64, from: Address?)
+    access(all) event Withdraw(id: UInt64, from: Address?)
     // Emitted when a token is deposited into a Collection
-    pub event Deposit(id: UInt64, to: Address?)
+    access(all) event Deposit(id: UInt64, to: Address?)
 
     // Emitted when a Tokens is destroyed
-    pub event TokensDestroyed(id: UInt64)
+    access(all) event TokensDestroyed(id: UInt64)
 
     // Emitted when a Memento is created
-    pub event MementoCreated(mementoID:String, magnetID:String)
+    access(all) event MementoCreated(mementoID:String, magnetID:String)
 
     // Emitted when a token mark claimed
-    pub event TokenClaimed(tokenID:UInt64)
+    access(all) event TokenClaimed(tokenID:UInt64)
 
     // Emitted when magnet metadata updated
-    pub event MagnetMetadataUpdated(id:String, metadata:{String:String})
+    access(all) event MagnetMetadataUpdated(id:String, metadata:{String:String})
 
     // Emitted when memento metadata updated
-    pub event MementoMetadataUpdated(id:String, metadata:{String:String})
+    access(all) event MementoMetadataUpdated(id:String, metadata:{String:String})
 
     // -----------------------------------------------------------------------
     // Magnetiq contract-level fields.
@@ -104,18 +105,18 @@ pub contract Magnetiq: NonFungibleToken {
     // -----------------------------------------------------------------------
 
     // variable for network
-    pub var currentNetwork: String 
+    access(all) var currentNetwork: String 
 
     // variable for roya;ity reciever address
-    pub var royalityReceiver: Address
+    access(all) var royalityReceiver: Address
 
     // variable for royality percentage
-    pub var royalityPercentage: UFix64
+    access(all) var royalityPercentage: UFix64
 
     // Series that this Brand belongs to.
     // Series is a concept that indicates a group of Brands through time.
     // Many Brands can exist at a time, but only one series.
-    pub var currentSeries: UInt32
+    access(all) var currentSeries: UInt32
 
     // Variable size dictionary of Magnet structs
     access(self) var magnetData: {String: Magnet}
@@ -138,7 +139,7 @@ pub contract Magnetiq: NonFungibleToken {
     // Because NFTs can be destroyed, it doesn't necessarily mean that this
     // reflects the total number of NFTs in existence, just the number that
     // have been minted to date. Also used as global token IDs for minting.
-    pub var totalSupply: UInt64
+    access(all) var totalSupply: UInt64
     
 
     // -----------------------------------------------------------------------
@@ -157,10 +158,10 @@ pub contract Magnetiq: NonFungibleToken {
     // its metadata. The magnets are publicly accessible, so anyone can
     // read the metadata associated with a specific magnet ID
     //
-    pub struct Magnet {
+    access(all) struct Magnet {
 
         // The unique ID for the Magnet
-        pub let magnetID: String
+        access(all) let magnetID: String
 
         // Array of memento ids that are a part of this Magnet.
         // When a memento is added to the mangnet, its ID gets appended here.
@@ -170,7 +171,7 @@ pub contract Magnetiq: NonFungibleToken {
         // This is not the long term way NFT metadata will be stored. It's a temporary
         // construct while we figure out a better way to do metadata.
         //
-        pub var metadata: {String: String}
+        access(all) var metadata: {String: String}
 
         // Mapping of memento IDs that indicates the number of tokens 
         // that have been minted for specific Memento in this Magnet.
@@ -186,24 +187,24 @@ pub contract Magnetiq: NonFungibleToken {
             self.mementos = []
         }
 
-        pub fun updateMementoList(mementoID: String)  {
+        access(all) fun updateMementoList(mementoID: String)  {
              self.mementos.append(mementoID)
              Magnetiq.magnetData[self.magnetID] = self
         }
 
-        pub fun updateMementoCount(mementoID: String, count: UInt32)  {
+        access(all) fun updateMementoCount(mementoID: String, count: UInt32)  {
             self.numberMintedPerMemento[mementoID] = count
             Magnetiq.magnetData[self.magnetID] = self
         }
-        pub fun updateMetadata(new_metadata:{String:String}){
+        access(all) fun updateMetadata(new_metadata:{String:String}){
             self.metadata = new_metadata
         }
     }
 
-    pub struct Memento{
-        pub let mementoID:String
-        pub let magnetID: String
-        pub var metadata: {String:String}
+    access(all) struct Memento{
+        access(all) let mementoID:String
+        access(all) let magnetID: String
+        access(all) var metadata: {String:String}
         
 
         init(mementoID:String, magnetID:String,metadata:{String:String}){
@@ -212,7 +213,7 @@ pub contract Magnetiq: NonFungibleToken {
             self.metadata = metadata
         }
         
-        pub fun updateMementoMetadata(new_metadata:{String:String}){
+        access(all) fun updateMementoMetadata(new_metadata:{String:String}){
             self.metadata = new_metadata
         }
 
@@ -229,13 +230,13 @@ pub contract Magnetiq: NonFungibleToken {
     // at the end of the contract. Only the admin has the ability 
     // to modify any data in the private Brand resource.
     //
-    pub struct BrandData {
+    access(all) struct BrandData {
 
         // Unique ID for the Brand
-        pub let brandID: String
+        access(all) let brandID: String
 
         // Name of the Brand
-        pub let name: String
+        access(all) let name: String
 
 
         init(name: String, brandID:String) {
@@ -266,10 +267,10 @@ pub contract Magnetiq: NonFungibleToken {
     //
     // If retireAll() and lock() are called back-to-back, 
     // the Brand is closed off forever and nothing more can be done with it.
-    pub resource Brand {
+    access(all) resource Brand {
 
         // Unique ID for the brand
-        pub let brandID: String
+        access(all) let brandID: String
 
         // Array of magnets that are a part of this brand.
         // When a magnet is added to the brand, its ID gets appended here.
@@ -290,7 +291,7 @@ pub contract Magnetiq: NonFungibleToken {
         // If a Brand is locked, Magnets cannot be added, but
         // Tokens can still be minted from Magnets
         // that exist in the Brand.
-        pub var locked: Bool
+        access(all) var locked: Bool
 
         // Mapping of Magnet IDs that indicates the number of Tokens 
         // that have been minted for specific Magnets in this Brand.
@@ -318,7 +319,7 @@ pub contract Magnetiq: NonFungibleToken {
         // The Brand needs to be not locked
         // The Magnet can't have already been added to the Brand
         //
-        pub fun addMagnet(magnetID: String) {
+        access(all) fun addMagnet(magnetID: String) {
             pre {
                 Magnetiq.magnetData[magnetID] != nil: "Cannot add the Magnet to Brand: Magnet doesn't exist."
                 !self.locked: "Cannot add the magnet to the Brand after the brand has been locked."
@@ -342,7 +343,7 @@ pub contract Magnetiq: NonFungibleToken {
         // Parameters: magnetIDs: The IDs of the Magnets that are being added
         //                      as an array
         //
-        pub fun addMagnets(magnetIDs: [String]) {
+        access(all) fun addMagnets(magnetIDs: [String]) {
             for magnet in magnetIDs {
                 self.addMagnet(magnetID: magnet)
             }
@@ -355,7 +356,7 @@ pub contract Magnetiq: NonFungibleToken {
         // Pre-Conditions:
         // The Magnet is part of the Brand and not retired (available for minting).
         // 
-        pub fun retireMagnet(magnetID: String) {
+        access(all) fun retireMagnet(magnetID: String) {
             pre {
                 self.retired[magnetID] != nil: "Cannot retire the Magnet: Magnet doesn't exist in this brand!"
             }
@@ -370,7 +371,7 @@ pub contract Magnetiq: NonFungibleToken {
         // retireAll retires all the magnets in the Brand
         // Afterwards, none of the retired Magnets will be able to mint new Tokens
         //
-        pub fun retireAll() {
+        access(all) fun retireAll() {
             for magnet in self.magnets {
                 self.retireMagnet(magnetID: magnet)
             }
@@ -380,7 +381,7 @@ pub contract Magnetiq: NonFungibleToken {
         //
         // Pre-Conditions:
         // The Brand should not be locked
-        pub fun lock() {
+        access(all) fun lock() {
             if !self.locked {
                 self.locked = true
                 emit BrandLocked(brandID: self.brandID)
@@ -396,7 +397,7 @@ pub contract Magnetiq: NonFungibleToken {
         //
         // Returns: The NFT that was minted
         // 
-        pub fun mintToken(magnetiqID: String, tokenType:String): @NFT {
+        access(all) fun mintToken(magnetiqID: String, tokenType:String): @NFT {
             
             var numInMagnetMemento: UInt32? = 0
             
@@ -451,7 +452,7 @@ pub contract Magnetiq: NonFungibleToken {
         //
         // Returns: Collection object that contains all the Tokens that were minted
         //
-        pub fun batchMintTokens(magnetiqID: String, quantity: UInt64,tokenType:String): @Collection {
+        access(all) fun batchMintTokens(magnetiqID: String, quantity: UInt64, tokenType:String): @Collection {
             let newCollection <- create Collection()
 
             var i: UInt64 = 0
@@ -463,15 +464,15 @@ pub contract Magnetiq: NonFungibleToken {
             return <-newCollection
         }
 
-        pub fun getMagnets(): [String] {
+        access(all) fun getMagnets(): [String] {
             return self.magnets
         }
 
-        pub fun getRetired(): {String: Bool} {
+        access(all) fun getRetired(): {String: Bool} {
             return self.retired
         }
 
-        pub fun getNumMintedPerMagnet(): {String: UInt32} {
+        access(all) fun getNumMintedPerMagnet(): {String: UInt32} {
             return self.numberMintedPerMagnet
         }
     }
@@ -481,12 +482,12 @@ pub contract Magnetiq: NonFungibleToken {
     // with the desired brand ID
     // let brandData = Magnetiq.QueryBrandData(brandID: 12)
     //
-    pub struct QueryBrandData {
-        pub let brandID: String
-        pub let name: String
+    access(all) struct QueryBrandData {
+        access(all) let brandID: String
+        access(all) let name: String
         access(self) var magnets: [String]
         access(self) var retired: {String: Bool}
-        pub var locked: Bool
+        access(all) var locked: Bool
         access(self) var numberMintedPerMagnet: {String: UInt32}
 
         init(brandID: String) {
@@ -499,37 +500,37 @@ pub contract Magnetiq: NonFungibleToken {
 
             self.brandID = brandID
             self.name = brandData.name
-            self.magnets = brand.magnets
-            self.retired = brand.retired
+            self.magnets = brand.getMagnets()
+            self.retired = brand.getRetired()
             self.locked = brand.locked
-            self.numberMintedPerMagnet = brand.numberMintedPerMagnet
+            self.numberMintedPerMagnet = brand.getNumMintedPerMagnet()
         }
 
-        pub fun getMagnets(): [String] {
+        access(all) fun getMagnets(): [String] {
             return self.magnets
         }
 
-        pub fun getRetired(): {String: Bool} {
+        access(all) fun getRetired(): {String: Bool} {
             return self.retired
         }
 
-        pub fun getNumberMintedPerMagnet(): {String: UInt32} {
+        access(all) fun getNumberMintedPerMagnet(): {String: UInt32} {
             return self.numberMintedPerMagnet
         }
     }
 
-    pub struct TokensData {
+    access(all) struct TokensData {
 
         // The ID of the Brand that the Tokens comes from
-        pub let brandID: String
+        access(all) let brandID: String
 
         // The ID of the Magnet that the Tokens references
-        pub let magnetiqID: String
+        access(all) let magnetiqID: String
 
         // The place in the edition that this Tokens was minted
         // Otherwise know as the serial number
-        pub let serialNumber: UInt32
-        pub let tokenType: String
+        access(all) let serialNumber: UInt32
+        access(all) let tokenType: String
 
 
         init(brandID: String, magnetiqID: String, serialNumber: UInt32, tokenType:String) {
@@ -543,20 +544,20 @@ pub contract Magnetiq: NonFungibleToken {
     // This is an implementation of a custom metadata view for Magnetiq.
     // This view contains the magnet metadata.
     // there will be 
-    pub struct MagnetiqTokenMetadataView {
+    access(all) struct MagnetiqTokenMetadataView {
 
-        pub let name: String?
-        pub let tokenType: String?
-        pub let brandName: String?
-        pub let serialNumber: UInt32
-        pub let magnetID: String
-        pub let mementoID: String?
-        pub let brandID: String
-        pub let numTokensInEdition: UInt32?
-        pub let is_claimed: AnyStruct?
-        pub let is_sellable: AnyStruct?
-        pub let is_claimable: AnyStruct?
-        pub let is_visible: AnyStruct?
+        access(all) let name: String?
+        access(all) let tokenType: String?
+        access(all) let brandName: String?
+        access(all) let serialNumber: UInt32
+        access(all) let magnetID: String
+        access(all) let mementoID: String?
+        access(all) let brandID: String
+        access(all) let numTokensInEdition: UInt32?
+        access(all) let is_claimed: AnyStruct?
+        access(all) let is_sellable: AnyStruct?
+        access(all) let is_claimable: AnyStruct?
+        access(all) let is_visible: AnyStruct?
 
 
         init(
@@ -591,15 +592,15 @@ pub contract Magnetiq: NonFungibleToken {
     // This is an implementation of a custom metadata view for Magnetiq.
     // This view contains the magnet metadata.
     // there will be 
-    pub struct MagnetTokenMetadataView {
+    access(all) struct MagnetTokenMetadataView {
 
-        pub let name: String?
-        pub let brandName: String?
-        pub let serialNumber: UInt32
-        pub let magnetID: String
-        pub let brandID: String
-        pub let numTokensInEdition: UInt32?
-        pub let is_sellable: AnyStruct?
+        access(all) let name: String?
+        access(all) let brandName: String?
+        access(all) let serialNumber: UInt32
+        access(all) let magnetID: String
+        access(all) let brandID: String
+        access(all) let numTokensInEdition: UInt32?
+        access(all) let is_sellable: AnyStruct?
 
         init(
             name: String?,
@@ -623,19 +624,19 @@ pub contract Magnetiq: NonFungibleToken {
     // This is an implementation of a custom metadata view for Magnetiq.
     // This view contains the magnet metadata.
     // there will be 
-    pub struct MementoTokenMetadataView {
+    access(all) struct MementoTokenMetadataView {
 
-        pub let name: String?
-        pub let brandName: String?
-        pub let serialNumber: UInt32
-        pub let magnetID: String
-        pub let mementoID: String
-        pub let brandID: String
-        pub let numTokensInEdition: UInt32?
-        pub let is_claimed: AnyStruct?
-        pub let is_sellable: AnyStruct?
-        pub let is_claimable: AnyStruct?
-        pub let is_visible: AnyStruct?
+        access(all) let name: String?
+        access(all) let brandName: String?
+        access(all) let serialNumber: UInt32
+        access(all) let magnetID: String
+        access(all) let mementoID: String
+        access(all) let brandID: String
+        access(all) let numTokensInEdition: UInt32?
+        access(all) let is_claimed: AnyStruct?
+        access(all) let is_sellable: AnyStruct?
+        access(all) let is_claimable: AnyStruct?
+        access(all) let is_visible: AnyStruct?
 
 
         init(
@@ -668,13 +669,15 @@ pub contract Magnetiq: NonFungibleToken {
 
     // The resource that represents the Tokens NFTs
     //
-    pub resource NFT: NonFungibleToken.INFT, MetadataViews.Resolver {
+    access(all) resource NFT: NonFungibleToken.NFT {
+
+        access(all) event ResourceDestroyed(id: UInt64 = self.id)
 
         // Global unique token ID
-        pub let id: UInt64
+        access(all) let id: UInt64
         
         // Struct of Tokens metadata
-        pub let data: TokensData
+        access(all) let data: TokensData
 
         init(serialNumber: UInt32, magnetiqID: String, brandID: String, tokenType:String ) {
             // Increment the global Tokens IDs
@@ -690,11 +693,11 @@ pub contract Magnetiq: NonFungibleToken {
 
         // If the Tokens is destroyed, emit an event to indicate 
         // to outside ovbservers that it has been destroyed
-        destroy() {
-            emit TokensDestroyed(id: self.id)
-        }
+        // destroy() {
+        //     emit TokensDestroyed(id: self.id)
+        // }
 
-        pub fun name(): String {
+        access(all) fun name(): String {
             let tokType: String = self.data.tokenType
             var fullName: String = ""
             if tokType == "magnet"{
@@ -721,7 +724,7 @@ pub contract Magnetiq: NonFungibleToken {
                 .concat(serialNumber)
         }
 
-        pub fun description(): String {
+        access(all) fun description(): String {
             var desc: String = ""
             if self.data.tokenType == "magnet"{
                 desc = Magnetiq.getMagnetMetaDataByField(magnetiqID: self.data.magnetiqID, field: "description") ?? ""
@@ -733,7 +736,7 @@ pub contract Magnetiq: NonFungibleToken {
         }
 
         // All supported metadata views for the Token including the Core NFT Views
-        pub fun getViews(): [Type] {
+        view access(all) fun getViews(): [Type] {
             return [
                 Type<MetadataViews.Display>(),
                 Type<MagnetiqTokenMetadataView>(), // keep the common view, and dont add individual magnet/memento view
@@ -752,7 +755,7 @@ pub contract Magnetiq: NonFungibleToken {
 
        
 
-        pub fun resolveView(_ view: Type): AnyStruct? {
+        access(all) fun resolveView(_ view: Type): AnyStruct? {
             switch view {
                 case Type<MetadataViews.Display>():
                     return MetadataViews.Display(
@@ -837,9 +840,9 @@ pub contract Magnetiq: NonFungibleToken {
                     )
                 case Type<MetadataViews.Royalties>():
                     let royaltyReceiver: Capability<&{FungibleToken.Receiver}> =
-                        getAccount(Magnetiq.RoyaltyAddress()).getCapability<&AnyResource{FungibleToken.Receiver}>(MetadataViews.getRoyaltyReceiverPublicPath())
+                        getAccount(Magnetiq.RoyaltyAddress()).capabilities.get<&{FungibleToken.Receiver}>(MetadataViews.getRoyaltyReceiverPublicPath())!
                     return MetadataViews.Royalties(
-                        royalties: [
+                        [
                             MetadataViews.Royalty(
                                 receiver: royaltyReceiver,
                                 cut: Magnetiq.royalityPercentage,
@@ -853,12 +856,10 @@ pub contract Magnetiq: NonFungibleToken {
                     return MetadataViews.NFTCollectionData(
                         storagePath: /storage/MagnetiqTokensCollection,
                         publicPath: /public/MagnetiqTokensCollection,
-                        providerPath: /private/MagnetiqTokensCollection,
-                        publicCollection: Type<&Magnetiq.Collection{Magnetiq.TokenCollectionPublic}>(),
-                        publicLinkedType: Type<&Magnetiq.Collection{Magnetiq.TokenCollectionPublic,NonFungibleToken.Receiver,NonFungibleToken.CollectionPublic,MetadataViews.ResolverCollection}>(),
-                        providerLinkedType: Type<&Magnetiq.Collection{NonFungibleToken.Provider,Magnetiq.TokenCollectionPublic,NonFungibleToken.Receiver,NonFungibleToken.CollectionPublic,MetadataViews.ResolverCollection}>(),
-                        createEmptyCollectionFunction: (fun (): @NonFungibleToken.Collection {
-                            return <-Magnetiq.createEmptyCollection()
+                        publicCollection: Type<&Magnetiq.Collection>(),
+                        publicLinkedType: Type<&Magnetiq.Collection>(),
+                        createEmptyCollectionFunction: (fun (): @{NonFungibleToken.Collection} {
+                            return <-Magnetiq.createEmptyCollection(nftType: Type<@Magnetiq.NFT>())
                         })
                     )
                 case Type<MetadataViews.NFTCollectionDisplay>():
@@ -899,7 +900,7 @@ pub contract Magnetiq: NonFungibleToken {
                     return MetadataViews.dictToTraits(dict: fullDictionary, excludedNames: excludedNames)
                 case Type<MetadataViews.Medias>():
                     return MetadataViews.Medias(
-                        items: [
+                        [
                             MetadataViews.Media(
                                 file: MetadataViews.HTTPFile(
                                     url: self.mediumimage()
@@ -923,7 +924,7 @@ pub contract Magnetiq: NonFungibleToken {
 
         // mapMagnetData helps build our trait map from magnet metadata
         // Returns: The trait map with all non-empty fields from magnet data added
-        pub fun mapMagnetData(dict: {String: AnyStruct}) : {String: AnyStruct} {
+        access(all) fun mapMagnetData(dict: {String: AnyStruct}) : {String: AnyStruct} {
             if self.data.tokenType == "magnet"{
                 let magnetMetadata = Magnetiq.getMagnetMetaData(magnetID: self.data.magnetiqID) ?? {}
                 for name in magnetMetadata.keys {
@@ -939,12 +940,12 @@ pub contract Magnetiq: NonFungibleToken {
 
         // getTokensURL 
         // Returns: The computed external url of the token
-        pub fun getTokensURL(): String {
+        view access(all) fun getTokensURL(): String {
             return "https://backend.magnetiq.xyz/token/".concat(self.id.toString())
         }
         // getEditionName Tokens's edition name is a combination of the Tokens's brandName and magnetID
         // `brandName: #magnetID`
-        pub fun getEditionName() : String {
+        access(all) fun getEditionName() : String {
             if self.data.tokenType != "magnet"{
                 return ""
             } 
@@ -952,8 +953,7 @@ pub contract Magnetiq: NonFungibleToken {
             let editionName = brandName.concat(": #").concat(self.data.magnetiqID)
             return editionName
         }
-
-        pub fun assetPath(): String {
+        access(all) fun assetPath(): String {
             if self.data.tokenType == "magnet" {
                 let magnet = (&Magnetiq.magnetData[self.data.magnetiqID] as &Magnet?)!
                 if magnet==nil {
@@ -976,29 +976,33 @@ pub contract Magnetiq: NonFungibleToken {
         }
 
         // returns a url to display an medium sized image
-        pub fun mediumimage(): String {
+        access(all) fun mediumimage(): String {
             let url = self.assetPath().concat("?width=512")
             return self.appendOptionalParams(url: url, firstDelim: "&")
         }
 
         // a url to display a thumbnail associated with the token
-        pub fun thumbnail(): String {
+        access(all) fun thumbnail(): String {
             let url = self.assetPath().concat("?width=256")
             return self.appendOptionalParams(url: url, firstDelim: "&")
         }
 
         // a url to display a video associated with the token
-        pub fun video(): String {
+        access(all) fun video(): String {
             let url = self.assetPath().concat("/video")
             return self.appendOptionalParams(url: url, firstDelim: "?")
         }
 
         // appends and optional network param needed to resolve the media
-        pub fun appendOptionalParams(url: String, firstDelim: String): String {
+        access(all) fun appendOptionalParams(url: String, firstDelim: String): String {
             if (Magnetiq.Network() == "testnet") {
                 return url.concat(firstDelim).concat("env=testnet")
             }
             return url
+        }
+        // Create an empty Collection for Pinnacle NFTs and return it to the caller
+        access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
+            return <- Magnetiq.createEmptyCollection(nftType: Type<@Magnetiq.NFT>())
         }
     }
 
@@ -1006,7 +1010,7 @@ pub contract Magnetiq: NonFungibleToken {
     // allows the owner to perform important functions to modify the 
     // various aspects of the Magnets, Brands, and Tokens
     //
-    pub resource Admin {
+    access(all) resource Admin {
 
         // createMagnet creates a new Magnet struct 
         // and stores it in the Magnets dictionary in the Magnetiq smart contract
@@ -1017,7 +1021,7 @@ pub contract Magnetiq: NonFungibleToken {
         //
         // Returns: the ID of the new Magnet object
         //
-        pub fun createMagnet(metadata: {String: String}, magnetID:String): String {
+        access(all) fun createMagnet(metadata: {String: String}, magnetID:String): String {
             pre {
                     Magnetiq.magnetData[magnetID] == nil: "Magnet already exists"
                 }
@@ -1031,7 +1035,7 @@ pub contract Magnetiq: NonFungibleToken {
             return magnetID
         }
 
-        pub fun createAndAddMagnet(metadata: {String: String}, magnetID:String, brandID:String): String {
+        access(all) fun createAndAddMagnet(metadata: {String: String}, magnetID:String, brandID:String): String {
             pre {
                     Magnetiq.brands[brandID] != nil : "The Brand doesn't exist"
             }
@@ -1041,7 +1045,7 @@ pub contract Magnetiq: NonFungibleToken {
             return magnetID
         }
 
-        pub fun updateMagnetMetadata(magnetID:String, new_metadata:{String:String}){
+        access(all) fun updateMagnetMetadata(magnetID:String, new_metadata:{String:String}){
             pre {
                     Magnetiq.magnetData[magnetID] != nil: "Magnet doesn't exist"
                 }
@@ -1051,7 +1055,7 @@ pub contract Magnetiq: NonFungibleToken {
             emit MagnetMetadataUpdated(id:magnetID , metadata: new_metadata)
         }
 
-        pub fun updateMementoMetadata(mementoID:String, new_metadata:{String:String}){
+        access(all) fun updateMementoMetadata(mementoID:String, new_metadata:{String:String}){
             pre {
                     Magnetiq.mementoData[mementoID] != nil: "Memento doesn't exist"
                 }
@@ -1062,7 +1066,7 @@ pub contract Magnetiq: NonFungibleToken {
         }
 
         //createMemento creates a new momnto linked with a magnet and stores in mementoData struct
-        pub fun createMemento(mementoID:String, magnetID:String,metadata:{String:String}): String
+        access(all) fun createMemento(mementoID:String, magnetID:String,metadata:{String:String}): String
         {
             pre{
                 Magnetiq.magnetData[magnetID]!=nil: "Cannot create Memento: Magnet Doesn't exist"
@@ -1088,7 +1092,7 @@ pub contract Magnetiq: NonFungibleToken {
         // Parameters: name: The name of the Brand
         //
         // Returns: The ID of the created brand
-        pub fun createBrand(name: String, brandID:String): String {
+        access(all) fun createBrand(name: String, brandID:String): String {
             pre {
                     Magnetiq.brands[brandID] == nil: "Brand with this id already exists"
             }
@@ -1113,7 +1117,7 @@ pub contract Magnetiq: NonFungibleToken {
         // Returns: A reference to the Brand with all of the fields
         // and methods exposed
         //
-        pub fun borrowBrand(brandID: String): &Brand {
+        access(all) fun borrowBrand(brandID: String): &Brand {
             pre {
                 Magnetiq.brands[brandID] != nil: "Cannot borrow Brand: The Brand doesn't exist"
             }
@@ -1126,11 +1130,11 @@ pub contract Magnetiq: NonFungibleToken {
 
         // createNewAdmin creates a new Admin resource
         //
-        pub fun createNewAdmin(): @Admin {
+        access(all) fun createNewAdmin(): @Admin {
             return <-create Admin()
         }
 
-        pub fun markTokenClaimed(tokenID:UInt64){
+        access(all) fun markTokenClaimed(tokenID:UInt64){
             pre{
                 Magnetiq.magnetiqTokenExtraInfo[tokenID] !=nil : "Token does not exist"
             }
@@ -1138,23 +1142,23 @@ pub contract Magnetiq: NonFungibleToken {
             emit TokenClaimed(tokenID:tokenID)
         }
 
-        pub fun setRoyalityReceiverAndPercentage(royaltyReceiver:Address, royalityPercentage: UFix64){
+        access(all) fun setRoyalityReceiverAndPercentage(royaltyReceiver:Address, royalityPercentage: UFix64){
             Magnetiq.royalityReceiver = royaltyReceiver
             Magnetiq.royalityPercentage = royalityPercentage
         }
 
-        pub fun setNetwork(networkName: String){
+        access(all) fun setNetwork(networkName: String){
             Magnetiq.currentNetwork = networkName
         }
 
-        pub fun allowAddressToSellNonSellableNFT(addresses: [Address]){
+        access(all) fun allowAddressToSellNonSellableNFT(addresses: [Address]){
             for addr in addresses{
             Magnetiq.allowedSellersForNonSellableNFT.append(addr)
             }
         }
 
         // function to add custom field at magnetiqToken level
-        pub fun addFieldsOnMagnetiqToken(tokenID:UInt64,fields:{String:AnyStruct}){
+        access(all) fun addFieldsOnMagnetiqToken(tokenID:UInt64,fields:{String:AnyStruct}){
             if let tokenField = Magnetiq.magnetiqTokenExtraInfo[tokenID] {
                 for name in fields.keys {
                         let value = fields[name] ?? nil
@@ -1169,7 +1173,7 @@ pub contract Magnetiq: NonFungibleToken {
             }
         }
 
-        pub fun removeFieldsOnMagnetiqToken(tokenID:UInt64, fields:[String]){
+        access(all) fun removeFieldsOnMagnetiqToken(tokenID:UInt64, fields:[String]){
             if let tokenField = Magnetiq.magnetiqTokenExtraInfo[tokenID] {
                 for name in fields {
                     tokenField.remove(key: name)
@@ -1180,19 +1184,16 @@ pub contract Magnetiq: NonFungibleToken {
             panic("Magnetiq Token doesn't exist")
             }
         }
-        pub fun resetAllowedSellersForNonSellableNFT(){
+        access(all) fun resetAllowedSellersForNonSellableNFT(){
             Magnetiq.allowedSellersForNonSellableNFT=[Magnetiq.account.address]
         }
     }
     // This is the interface that users can cast their Tokens Collection as
     // to allow others to deposit Tokens into their Collection. It also allows for reading
     // the IDs of Tokens in the Collection.
-    pub resource interface TokenCollectionPublic {
-        pub fun deposit(token: @NonFungibleToken.NFT)
-        pub fun batchDeposit(tokens: @NonFungibleToken.Collection)
-        pub fun getIDs(): [UInt64]
-        pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT
-        pub fun borrowToken(id: UInt64): &Magnetiq.NFT? {
+    access(all) resource interface TokenCollectionPublic : NonFungibleToken.CollectionPublic {
+        access(all) fun batchDeposit(tokens: @{NonFungibleToken.Collection})
+        access(all) fun borrowToken(id: UInt64): &Magnetiq.NFT? {
             // If the result isn't nil, the id of the returned reference
             // should be the same as the argument to the function
             post {
@@ -1202,16 +1203,43 @@ pub contract Magnetiq: NonFungibleToken {
         }
     }
 
+
     // Collection is a resource that every user who owns NFTs 
     // will store in their account to manage their NFTS
     //
-    pub resource Collection: TokenCollectionPublic, NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection { 
+    access(all) resource Collection: TokenCollectionPublic, NonFungibleToken.Collection {
         // Dictionary of Token (Magnet/Memeto) conforming tokens
         // NFT is a resource type with a UInt64 ID field
-        pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
+        access(all) var ownedNFTs: @{UInt64: {NonFungibleToken.NFT}}
 
         init() {
             self.ownedNFTs <- {}
+        }
+
+        // Return a list of NFT types that this receiver accepts
+        access(all) view fun getSupportedNFTTypes(): {Type: Bool} {
+            let supportedTypes: {Type: Bool} = {}
+            supportedTypes[Type<@Magnetiq.NFT>()] = true
+            return supportedTypes
+        }
+
+        // Return whether or not the given type is accepted by the collection
+        // A collection that can accept any type should just return true by default
+        access(all) view fun isSupportedNFTType(type: Type): Bool {
+            if type == Type<@Magnetiq.NFT>() {
+                return true
+            }
+            return false
+        }
+
+        // Return the amount of NFTs stored in the collection
+        access(all) view fun getLength(): Int {
+            return self.ownedNFTs.length
+        }
+
+        // Create an empty Collection for TopShot NFTs and return it to the caller
+        access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
+            return <- Magnetiq.createEmptyCollection(nftType: Type<@Magnetiq.NFT>())
         }
 
         // withdraw removes an Token from the Collection and moves it to the caller
@@ -1220,10 +1248,12 @@ pub contract Magnetiq: NonFungibleToken {
         // that is to be removed from the Collection
         //
         // returns: @NonFungibleToken.NFT the token that was withdrawn
-        pub fun withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
+
+        access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
 
             // Borrow nft and check if locked
-            let nft = self.borrowNFT(id: withdrawID)
+            let nft = self.borrowNFT(withdrawID)
+                ?? panic("Cannot borrow: empty reference")
             if MagnetiqLocking.isLocked(nftRef: nft) {
                 panic("Cannot withdraw: Token is locked")
             }
@@ -1261,7 +1291,7 @@ pub contract Magnetiq: NonFungibleToken {
         // Returns: @NonFungibleToken.Collection: A collection that contains
         //                                        the withdrawn Token
         //
-        pub fun batchWithdraw(ids: [UInt64]): @NonFungibleToken.Collection {
+        access(NonFungibleToken.Withdraw) fun batchWithdraw(ids: [UInt64]): @{NonFungibleToken.Collection} {
             // Create a new empty Collection
             var batchCollection <- create Collection()
             
@@ -1278,7 +1308,7 @@ pub contract Magnetiq: NonFungibleToken {
         //
         // Paramters: token: the NFT to be deposited in the collection
         //
-        pub fun deposit(token: @NonFungibleToken.NFT) {
+        access(all) fun deposit(token: @{NonFungibleToken.NFT}) {
             
             // Cast the deposited token as a Magnetiq NFT to make sure
             // it is the correct type
@@ -1302,7 +1332,7 @@ pub contract Magnetiq: NonFungibleToken {
 
         // batchDeposit takes a Collection object as an argument
         // and deposits each contained NFT into this Collection
-        pub fun batchDeposit(tokens: @NonFungibleToken.Collection) {
+        access(all) fun batchDeposit(tokens: @{NonFungibleToken.Collection}) {
 
             // Get an array of the IDs to be deposited
             let keys = tokens.getIDs()
@@ -1318,7 +1348,7 @@ pub contract Magnetiq: NonFungibleToken {
 
         // lock takes a token id and a duration in seconds and locks
         // the token for that duration
-        pub fun lock(id: UInt64, duration: UFix64) {
+        access(NonFungibleToken.Update) fun lock(id: UInt64, duration: UFix64) {
             // Remove the nft from the Collection
             let token <- self.ownedNFTs.remove(key: id) 
                 ?? panic("Cannot lock: Token does not exist in the collection")
@@ -1332,7 +1362,7 @@ pub contract Magnetiq: NonFungibleToken {
 
         // batchLock takes an array of token ids and a duration in seconds
         // it iterates through the ids and locks each for the specified duration
-        pub fun batchLock(ids: [UInt64], duration: UFix64) {
+        access(NonFungibleToken.Update) fun batchLock(ids: [UInt64], duration: UFix64) {
             // Iterate through the ids and lock them
             for id in ids {
                 self.lock(id: id, duration: duration)
@@ -1341,7 +1371,7 @@ pub contract Magnetiq: NonFungibleToken {
 
         // unlock takes a token id and attempts to unlock it
         // MagnetiqLocking.unlockNFT contains business logic around unlock eligibility
-        pub fun unlock(id: UInt64) {
+        access(NonFungibleToken.Update) fun unlock(id: UInt64) {
             // Remove the nft from the Collection
             let token <- self.ownedNFTs.remove(key: id) 
                 ?? panic("Cannot lock: Token does not exist in the collection")
@@ -1355,15 +1385,40 @@ pub contract Magnetiq: NonFungibleToken {
 
         // batchUnlock takes an array of token ids
         // it iterates through the ids and unlocks each if they are eligible
-        pub fun batchUnlock(ids: [UInt64]) {
+        access(NonFungibleToken.Update) fun batchUnlock(ids: [UInt64]) {
             // Iterate through the ids and unlocks them
             for id in ids {
                 self.unlock(id: id)
             }
         }
 
+        // destroyMoments destroys moments in this collection
+        // unlocks the moments if they are locked
+        //
+        // Parameters: ids: An array of NFT IDs
+        // to be destroyed from the Collection
+        access(NonFungibleToken.Update) fun destroyMoments(ids: [UInt64]) {
+            let magnetiqLockingAdmin = Magnetiq.account.storage.borrow<&MagnetiqLocking.Admin>(from: MagnetiqLocking.AdminStoragePath())
+                ?? panic("No MagnetiqLocking admin resource in storage")
+
+            for id in ids {
+                // Remove the nft from the Collection
+                let token <- self.ownedNFTs.remove(key: id)
+                    ?? panic("Cannot destroy: Moment does not exist in collection: ".concat(id.toString()))
+
+                // Emit a withdraw event here so that platforms do not have to understand TopShot-specific events to see ownership change
+                // A withdraw without a corresponding deposit means the NFT in question has no owner address
+                emit Withdraw(id: id, from: self.owner?.address)
+
+                // does nothing if the moment is not locked
+                magnetiqLockingAdmin.unlockByID(id: id)
+
+                destroy token
+            }
+        }
+
         // getIDs returns an array of the IDs that are in the Collection
-        pub fun getIDs(): [UInt64] {
+        view access(all) fun getIDs(): [UInt64] {
             return self.ownedNFTs.keys
         }
 
@@ -1378,8 +1433,8 @@ pub contract Magnetiq: NonFungibleToken {
         // not any Magnetiq specific data. Please use borrowToken to 
         // read Token data.
         //
-        pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT {
-            return (&self.ownedNFTs[id] as &NonFungibleToken.NFT?)!
+        view access(all) fun borrowNFT(_ id: UInt64): &{NonFungibleToken.NFT}? {
+            return (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)!
         }
 
         // borrowToken returns a borrowed reference to a Token
@@ -1392,19 +1447,19 @@ pub contract Magnetiq: NonFungibleToken {
         // Parameters: id: The ID of the NFT to get the reference for
         //
         // Returns: A reference to the NFT
-        pub fun borrowToken(id: UInt64): &Magnetiq.NFT? {
+        view access(all) fun borrowToken(id: UInt64): &Magnetiq.NFT? {
             if self.ownedNFTs[id] != nil {
-                let ref = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
+                let ref = (&self.ownedNFTs[id] as auth(NonFungibleToken.Update) &{NonFungibleToken.NFT}?)!
                 return ref as! &Magnetiq.NFT
             } else {
                 return nil
             }
         }
 
-        pub fun borrowViewResolver(id: UInt64): &AnyResource{MetadataViews.Resolver} {
-            let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)! 
+        view access(all) fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver} {
+            let nft = (&self.ownedNFTs[id] as auth(NonFungibleToken.Update) &{NonFungibleToken.NFT}?)!
             let magnetiqNFT = nft as! &Magnetiq.NFT
-            return magnetiqNFT as &AnyResource{MetadataViews.Resolver}
+            return magnetiqNFT as &{ViewResolver.Resolver}
         }
 
         // If a transaction destroys the Collection object,
@@ -1412,9 +1467,9 @@ pub contract Magnetiq: NonFungibleToken {
         // Much like when Damian Lillard destroys the hopes and
         // dreams of the entire city of Houston.
         //
-        destroy() {
-            destroy self.ownedNFTs
-        }
+        // destroy() {
+        //     destroy self.ownedNFTs
+        // }
     }
 
     // -----------------------------------------------------------------------
@@ -1426,21 +1481,25 @@ pub contract Magnetiq: NonFungibleToken {
     // Once they have a Collection in their storage, they are able to receive
     // Tokens in transactions.
     //
-    pub fun createEmptyCollection(): @NonFungibleToken.Collection {
+
+    access(all) fun createEmptyCollection(nftType: Type): @{NonFungibleToken.Collection} {
+        if nftType != Type<@Magnetiq.NFT>() {
+            panic("NFT type is not supported")
+        }
         return <-create Magnetiq.Collection()
     }
 
     // getAllMagnets returns all the magnets in Magnetiq
     //
     // Returns: An array of all the magnets that have been created
-    pub fun getAllMagnets(): [Magnetiq.Magnet] {
+    access(all) fun getAllMagnets(): [Magnetiq.Magnet] {
         return Magnetiq.magnetData.values
     }
 
     // getAllMementos returns all the mementos in Magnetiq
     //
     // Returns: An array of all the mementos that have been created
-    pub fun getAllMementos(): [Magnetiq.Memento] {
+    access(all) fun getAllMementos(): [Magnetiq.Memento] {
         return Magnetiq.mementoData.values
     }
 
@@ -1449,7 +1508,7 @@ pub contract Magnetiq: NonFungibleToken {
     // Parameters: magnetID: The id of the Magnet that is being searched
     //
     // Returns: The metadata as a String to String mapping optional
-    pub fun getMagnetMetaData(magnetID: String): {String: String}? {
+    access(all) fun getMagnetMetaData(magnetID: String): {String: String}? {
         return self.magnetData[magnetID]?.metadata
     }
 
@@ -1462,7 +1521,7 @@ pub contract Magnetiq: NonFungibleToken {
     //             field: The field to search for
     //
     // Returns: The metadata field as a String Optional
-    pub fun getMagnetMetaDataByField(magnetiqID: String, field: String): String? {
+    access(all) fun getMagnetMetaDataByField(magnetiqID: String, field: String): String? {
         // Don't force a revert if the magnetID or field is invalid
         if let magnet = Magnetiq.magnetData[magnetiqID] {
             return magnet.metadata[field]
@@ -1476,11 +1535,11 @@ pub contract Magnetiq: NonFungibleToken {
     // Parameters: mementoID: The id of the Magnet that is being searched
     //
     // Returns: The metadata as a String to String mapping optional
-    pub fun getMementoMetaData(magnetiqID: String): {String: String}? {
+    access(all) fun getMementoMetaData(magnetiqID: String): {String: String}? {
         return self.mementoData[magnetiqID]?.metadata
     }
 
-    pub fun getMementoMetaDataByField(magnetiqID: String, field: String): String? {
+    access(all) fun getMementoMetaDataByField(magnetiqID: String, field: String): String? {
         // Don't force a revert if the magnetID or field is invalid
         if let memento = Magnetiq.mementoData[magnetiqID]{
                 return memento.metadata[field]
@@ -1494,7 +1553,7 @@ pub contract Magnetiq: NonFungibleToken {
     // Parameters: brandID: The id of the Brand that is being searched
     //
     // Returns: The QueryBrandData struct that has all the important information about the brand
-    pub fun getBrandData(brandID: String): QueryBrandData? {
+    access(all) fun getBrandData(brandID: String): QueryBrandData? {
         if Magnetiq.brands[brandID] == nil {
             return nil
         } else {
@@ -1508,7 +1567,7 @@ pub contract Magnetiq: NonFungibleToken {
     // Parameters: brandID: The id of the Brand that is being searched
     //
     // Returns: The name of the Brand
-    pub fun getBrandName(brandID: String): String? {
+    access(all) fun getBrandName(brandID: String): String? {
         // Don't force a revert if the brandID is invalid
         return Magnetiq.brandData[brandID]?.name
     }
@@ -1519,7 +1578,7 @@ pub contract Magnetiq: NonFungibleToken {
     // Parameters: brandName: The name of the Brand that is being searched
     //
     // Returns: An array of the IDs of the Brand if it exists, or nil if doesn't
-    pub fun getBrandIDsByName(brandName: String): [String]? {
+    access(all) fun getBrandIDsByName(brandName: String): [String]? {
         var brandIDs: [String] = []
 
         // Iterate through all the brandData and search for the name
@@ -1544,7 +1603,7 @@ pub contract Magnetiq: NonFungibleToken {
     // Parameters: brandID: The id of the Brand that is being searched
     //
     // Returns: An array of Magnet IDs
-    pub fun getMagnetsInBrand(brandID: String): [String]? {
+    access(all) fun getMagnetsInBrand(brandID: String): [String]? {
         // Don't force a revert if the brandID is invalid
         return Magnetiq.brands[brandID]?.magnets
     }
@@ -1554,20 +1613,20 @@ pub contract Magnetiq: NonFungibleToken {
     // Parameters: magnetID: The id of the Brand that is being searched
     //
     // Returns: An array of Memento IDs
-    pub fun getMementoInMagnet(magnetID: String): [String]? {
+    access(all) fun getMementoInMagnet(magnetID: String): [String]? {
         // Don't force a revert if the magnetID is invalid
         return Magnetiq.magnetData[magnetID]?.mementos
     }
 
     // function to check if a memento is claimed or not
-    pub fun isMementoTokenClaimed(tokenID:UInt64): AnyStruct? {
+    access(all) fun isMementoTokenClaimed(tokenID:UInt64): AnyStruct? {
         if let is_claimed = Magnetiq.magnetiqTokenExtraInfo[tokenID]!["claimed"] {
             return is_claimed
         }
         return nil
     }
 
-    pub fun getMagnetiqTokenExtraData(tokenID:UInt64): {String:AnyStruct}?{
+    access(all) fun getMagnetiqTokenExtraData(tokenID:UInt64): {String:AnyStruct}?{
         return Magnetiq.magnetiqTokenExtraInfo[tokenID]
     }
 
@@ -1579,7 +1638,7 @@ pub contract Magnetiq: NonFungibleToken {
     // Parameters: brandID: The id of the Brand that is being searched
     //
     // Returns: Boolean indicating if the Brand is locked or not
-    pub fun isBrandLocked(brandID: String): Bool? {
+    access(all) fun isBrandLocked(brandID: String): Bool? {
         // Don't force a revert if the brandID is invalid
         return Magnetiq.brands[brandID]?.locked
     }
@@ -1592,7 +1651,7 @@ pub contract Magnetiq: NonFungibleToken {
     //
     // Returns: The total number of Tokens 
     //          that have been minted from an edition
-    pub fun getNumTokensInEdition(brandID: String, magnetiqID: String,tokenType:String): UInt32? {
+    access(all) fun getNumTokensInEdition(brandID: String, magnetiqID: String,tokenType:String): UInt32? {
         if tokenType == "magnet" {
             if let branddata = self.getBrandData(brandID: brandID) {
                 // Read the numMintedPerMagnet
@@ -1618,8 +1677,64 @@ pub contract Magnetiq: NonFungibleToken {
     }
 
     // function which returns allowed sellers list
-    pub fun getAllowedSellersForNonSellableNFT():[Address?]{
+    access(all) fun getAllowedSellersForNonSellableNFT():[Address?]{
         return self.allowedSellersForNonSellableNFT
+    }
+
+    //------------------------------------------------------------
+    // Contract MetadataViews
+    //------------------------------------------------------------
+
+    /// Return the metadata view types available for this contract
+    ///
+    view access(all) fun getContractViews(resourceType: Type?): [Type] {
+        return [Type<MetadataViews.NFTCollectionData>(), Type<MetadataViews.NFTCollectionDisplay>()]
+    }
+
+    /// Resolve this contract's metadata views
+    ///
+    view access(all) fun resolveContractView(resourceType: Type?, viewType: Type): AnyStruct? {
+        post {
+            result == nil || result!.getType() == viewType: "The returned view must be of the given type or nil"
+        }
+        switch viewType {
+            case Type<MetadataViews.NFTCollectionData>():
+                return MetadataViews.NFTCollectionData(
+                    storagePath: /storage/MagnetiqTokensCollection,
+                    publicPath: /public/MagnetiqTokensCollection,
+                    publicCollection: Type<&Magnetiq.Collection>(),
+                    publicLinkedType: Type<&Magnetiq.Collection>(),
+                    createEmptyCollectionFunction: (fun (): @{NonFungibleToken.Collection} {
+                        return <-Magnetiq.createEmptyCollection(nftType: Type<@Magnetiq.NFT>())
+                    })
+                )
+            case Type<MetadataViews.NFTCollectionDisplay>():
+                let bannerImage = MetadataViews.Media(
+                    file: MetadataViews.HTTPFile(
+                        url: "https://magnetiq-static.s3.amazonaws.com/media/public/MAGNETIQ_banner.png"
+                    ),
+                    mediaType: "image/png"
+                )
+                let squareImage = MetadataViews.Media(
+                    file: MetadataViews.HTTPFile(
+                        url: "https://magnetiq-static.s3.amazonaws.com/media/public/MAGNETIQ_Square_Logo.png"
+                    ),
+                    mediaType: "image/png"
+                )
+                return MetadataViews.NFTCollectionDisplay(
+                    name: "MAGNETIQ",
+                    description: "MAGNETIQ is making managing brand community engagement easy and efficient with a plug and play, blockchain powered platform.  MAGNETIQ NFTs represent your membership in brand communities.",
+                    externalURL: MetadataViews.ExternalURL("https://www.magnetiq.xyz/"),
+                    squareImage: squareImage,
+                    bannerImage: bannerImage,
+                    socials: {
+                        "twitter": MetadataViews.ExternalURL("https://twitter.com/magnetiq_xyz"),
+                        "discord": MetadataViews.ExternalURL("https://discord.com/invite/Magnetiq"),
+                        "instagram": MetadataViews.ExternalURL("https://www.instagram.com/magnetiq_xyz")
+                    }
+                )
+        }
+        return nil
     }
 
     // -----------------------------------------------------------------------
@@ -1638,19 +1753,21 @@ pub contract Magnetiq: NonFungibleToken {
         // e.g : claimed = true/false
         self.magnetiqTokenExtraInfo = {}
         self.totalSupply = 0 //total supply of all magnets/memento, used to assign new id to NFT
-        self.currentNetwork = "mainnet" //  current network for contract
-        self.royalityReceiver = 0x593fb684e04120f5 // address to receive royality
+        self.currentNetwork = "testnet" //  current network for contract
+        self.royalityReceiver = 0x214cf7a682afadc6 // address to receive royality
         self.royalityPercentage = 0.05 // percentage of royality go to royalityReceiver
         self.allowedSellersForNonSellableNFT = [self.account.address] // allowing admin to sell non sellable NFT
 
         // Put a new Collection in storage
-        self.account.save<@Collection>(<- create Collection(), to: /storage/MagnetiqTokensCollection)
+        self.account.storage.save<@Collection>(<- create Collection(), to: /storage/MagnetiqTokensCollection)
 
         // Create a public capability for the Collection
-        self.account.link<&{TokenCollectionPublic}>(/public/MagnetiqTokensCollection, target: /storage/MagnetiqTokensCollection)
+        let cap = self.account.capabilities.storage.issue<&Magnetiq.Collection>(/storage/MagnetiqTokensCollection)
+        self.account.capabilities.publish(cap, at: /public/MagnetiqTokensCollection)
+        // self.account.capabilities.storage.issue<&{TokenCollectionPublic}>(/public/MagnetiqTokensCollection, target: /storage/MagnetiqTokensCollection)
 
         // Put the Minter in storage
-        self.account.save<@Admin>(<- create Admin(), to: /storage/MagnetiqAdmin)
+        self.account.storage.save<@Admin>(<- create Admin(), to: /storage/MagnetiqAdmin)
 
         emit ContractInitialized()
     }
